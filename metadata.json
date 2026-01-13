@@ -1,5 +1,5 @@
 {
-  "name": "e-Stylist: Virtual Fitting Room",
+  "name": "Styleme-Frontend",
   "description": "An intelligent virtual fitting room that uses the Gemini API to offer a personalized fashion experience. It allows users to manage a digital wardrobe, create AI-generated looks, and explore an integrated store.",
   "requestFramePermissions": [
     "camera"

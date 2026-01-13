@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Look } from '../types';
 import { Button } from './common/Button';
 import { BookmarkIcon } from './icons';
@@ -10,55 +10,32 @@ interface ResultsCarouselProps {
 }
 
 export const ResultsCarousel: React.FC<ResultsCarouselProps> = ({ looks, onSaveLook }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % looks.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + looks.length) % looks.length);
-  };
-  
-  const currentLook = looks[currentIndex];
+  if (!looks || looks.length === 0) {
+    return null;
+  }
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-sm h-96 perspective-1000">
-        <div
-          className="relative w-full h-full transform-style-preserve-3d transition-transform duration-700"
-          style={{ transform: `rotateY(${currentIndex * -90}deg)` }}
-        >
-          {looks.map((look, index) => (
-            <div
-              key={look.id}
-              className="absolute w-full h-full backface-hidden"
-              style={{ transform: `rotateY(${index * 90}deg) translateZ(12rem)` }}
-            >
-              <img src={look.imageUrl} alt={look.name} className="w-full h-full object-cover rounded-lg shadow-2xl" />
+    <div className="w-full h-full p-4 md:p-6 animate-fade-in overflow-y-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+        {looks.map((look) => (
+          <div key={look.id} className="bg-surface rounded-lg overflow-hidden flex flex-col shadow-lg">
+            <img src={look.imageUrl} alt={look.name} className="w-full h-64 object-cover" />
+            <div className="p-4 flex flex-col flex-grow">
+              <h3 className="text-lg font-serif text-primary">{look.name}</h3>
+              <p className="text-sm text-text-secondary flex-grow my-2 line-clamp-3">{look.description}</p>
+              <div className="flex justify-between items-center mt-auto pt-2">
+                <div className="text-xs font-bold text-primary">
+                  AFINIDADE: {look.score.toFixed(1)} / 10.0
+                </div>
+                <Button onClick={() => onSaveLook(look)} variant="secondary" className="px-3 py-1.5">
+                  <BookmarkIcon className="w-4 h-4" />
+                  Salvar
+                </Button>
+              </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
-      
-      <div className="flex justify-center gap-8 mt-6 w-full">
-        <button onClick={prevSlide} className="text-text-secondary hover:text-primary transition-colors p-2 rounded-full bg-surface">
-          &lt;
-        </button>
-        <div className="text-center w-64">
-            <h3 className="text-lg font-serif text-primary">{currentLook.name}</h3>
-            <p className="text-sm text-text-secondary h-10 overflow-hidden">{currentLook.description}</p>
-            <div className="mt-2 text-xs font-bold text-primary">AFINIDADE: {currentLook.score.toFixed(1)} / 10.0</div>
-        </div>
-        <button onClick={nextSlide} className="text-text-secondary hover:text-primary transition-colors p-2 rounded-full bg-surface">
-          &gt;
-        </button>
-      </div>
-
-      <Button onClick={() => onSaveLook(currentLook)} variant="secondary" className="mt-4">
-          <BookmarkIcon className="w-5 h-5"/>
-          Salvar Look
-      </Button>
     </div>
   );
 };

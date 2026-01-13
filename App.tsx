@@ -11,6 +11,8 @@ import { AppMode, Look, WardrobeItem, Product, UserProfile } from './types';
 import { MOCK_WARDROBE, MOCK_STORE_PRODUCTS, MOCK_SAVED_LOOKS } from './constants';
 import { ArrowUturnLeftIcon } from './components/icons';
 
+type GenerationState = 'idle' | 'loading' | 'error' | 'reason' | 'success';
+
 export default function App() {
   const [mode, setMode] = useState<AppMode>(AppMode.Consumer);
   const { userProfile, saveUserProfile, isProfileComplete } = useUserProfile();
@@ -24,7 +26,7 @@ export default function App() {
   const [selectedStoreItems, setSelectedStoreItems] = useState<string[]>([]);
   
   const [generatedLooks, setGeneratedLooks] = useState<Look[] | null>(null);
-  const [generationState, setGenerationState] = useState<'idle' | 'loading' | 'error' | 'reason'>('idle');
+  const [generationState, setGenerationState] = useState<GenerationState>('idle');
   const [reason, setReason] = useState<string | null>(null);
 
   const [isWardrobeFullScreen, setWardrobeFullScreen] = useState(false);

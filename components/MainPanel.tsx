@@ -4,10 +4,12 @@ import { UserProfile, Look } from '../types';
 import { ResultsCarousel } from './ResultsCarousel';
 import { SparklesIcon } from './icons';
 
+type GenerationState = 'idle' | 'loading' | 'error' | 'reason' | 'success';
+
 interface MainPanelProps {
   userProfile: UserProfile | null;
   generatedLooks: Look[] | null;
-  generationState: 'idle' | 'loading' | 'error' | 'reason';
+  generationState: GenerationState;
   reason: string | null;
   onSaveLook: (look: Look) => void;
 }
@@ -52,11 +54,17 @@ export const MainPanel: React.FC<MainPanelProps> = ({
             )}
           </div>
         );
-      case 'idle':
-      default:
-        if (generatedLooks && generatedLooks.length > 0) {
+      case 'success':
+         if (generatedLooks && generatedLooks.length > 0) {
           return <ResultsCarousel looks={generatedLooks} onSaveLook={onSaveLook} />;
         }
+        return (
+             <div className="flex flex-col items-center justify-center h-full text-text-secondary text-center p-8">
+                <p>Looks gerados, mas ocorreu um erro ao exibi-los.</p>
+            </div>
+        );
+      case 'idle':
+      default:
         if (userProfile?.baseImage) {
           return (
             <div className="flex flex-col items-center justify-center h-full animate-fade-in p-4">

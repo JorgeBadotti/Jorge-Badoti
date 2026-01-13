@@ -5,6 +5,8 @@ import { Button } from './common/Button';
 import { SparklesIcon } from './icons';
 import { generateLookDescriptions, generateLookImage } from '../services/geminiService';
 
+type GenerationState = 'idle' | 'loading' | 'error' | 'reason' | 'success';
+
 interface StylePanelProps {
   userProfile: UserProfile;
   wardrobe: WardrobeItem[];
@@ -12,7 +14,7 @@ interface StylePanelProps {
   selectedWardrobeItems: string[];
   selectedStoreItems: string[];
   setGeneratedLooks: (looks: Look[] | null) => void;
-  setGenerationState: (state: 'idle' | 'loading' | 'error' | 'reason') => void;
+  setGenerationState: (state: GenerationState) => void;
   setReason: (reason: string | null) => void;
   mode: AppMode;
 }
@@ -79,7 +81,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           };
         }));
         setGeneratedLooks(looksWithImages);
-        setGenerationState('idle');
+        setGenerationState('success');
       }
     } catch (error) {
       console.error("Look generation failed:", error);

@@ -25,6 +25,7 @@ interface UploadingFile {
 
 export const AddItemForm: React.FC<AddItemFormProps> = ({ isOpen, onClose, onAddItems }) => {
   const [files, setFiles] = useState<UploadingFile[]>([]);
+  const [isClassifying, setIsClassifying] = useState(false);
 
   const handleFileChange = (selectedFiles: FileList | null) => {
     if (selectedFiles) {
@@ -48,27 +49,30 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ isOpen, onClose, onAdd
   }, []);
 
   const classifyAll = async () => {
-    setFiles(currentFiles => currentFiles.map(f => f.status === 'pending' ? { ...f, status: 'classifying' } : f));
-
-    await Promise.all(files.map(async (uploadingFile, index) => {
-      if(uploadingFile.status !== 'classifying') return;
-      try {
-        const { name, category } = await classifyClothingItem(uploadingFile.file);
-        setFiles(currentFiles => {
-          const newFiles = [...currentFiles];
-          newFiles[index] = { ...newFiles[index], name, category, status: 'success' };
-          return newFiles;
-        });
-      } catch (e) {
-        console.error("Classification failed for", uploadingFile.file.name, e);
-        const errorMessage = e instanceof Error ? e.message : "Erro desconhecido.";
-        setFiles(currentFiles => {
-          const newFiles = [...currentFiles];
-          newFiles[index] = { ...newFiles[index], status: 'error', errorMessage };
-          return newFiles;
-        });
+    setIsClassifying(true);
+    // Process files one by one for better UX and to avoid overwhelming the API
+    for (const fileToProcess of files) {
+      if (fileToProcess.status === 'pending') {
+        // Set current file to 'classifying'
+        setFiles(currentFiles => currentFiles.map(f =>
+          f.preview === fileToProcess.preview ? { ...f, status: 'classifying' } : f
+        ));
+        
+        try {
+          const { name, category } = await classifyClothingItem(fileToProcess.file);
+          setFiles(currentFiles => currentFiles.map(f =>
+            f.preview === fileToProcess.preview ? { ...f, name, category, status: 'success' } : f
+          ));
+        } catch (e) {
+          console.error("Classification failed for", fileToProcess.file.name, e);
+          const errorMessage = e instanceof Error ? e.message : "Erro desconhecido.";
+          setFiles(currentFiles => currentFiles.map(f =>
+            f.preview === fileToProcess.preview ? { ...f, status: 'error', errorMessage } : f
+          ));
+        }
       }
-    }));
+    }
+    setIsClassifying(false);
   };
   
   const handleAdd = () => {
@@ -84,8 +88,8 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ isOpen, onClose, onAdd
     onClose();
   };
 
-  const isAddDisabled = files.length === 0 || files.some(f => f.status !== 'success');
-  const isClassifyDisabled = files.length === 0 || files.every(f => f.status !== 'pending');
+  const isAddDisabled = files.length === 0 || files.some(f => f.status !== 'success') || isClassifying;
+  const isClassifyDisabled = files.length === 0 || files.every(f => f.status !== 'pending') || isClassifying;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Adicionar Peças ao Guarda-Roupa">
@@ -122,7 +126,9 @@ export const AddItemForm: React.FC<AddItemFormProps> = ({ isOpen, onClose, onAdd
         )}
 
         <div className="flex justify-end gap-4 pt-4">
-            <Button onClick={classifyAll} variant="secondary" disabled={isClassifyDisabled}>Classificar com IA</Button>
+            <Button onClick={classifyAll} variant="secondary" disabled={isClassifyDisabled}>
+              {isClassifying ? 'Classificando...' : 'Classificar com IA'}
+            </Button>
             <Button onClick={handleAdd} disabled={isAddDisabled}>Adicionar</Button>
         </div>
       </div>

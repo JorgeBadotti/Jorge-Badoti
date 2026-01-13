@@ -38,8 +38,8 @@ export const MOCK_STORE_PRODUCTS: Product[] = [
 ];
 
 export const MOCK_SAVED_LOOKS: Look[] = [
-    { id: 'l1', name: 'Casual Chic de Verão', description: 'Um look leve e elegante para um passeio à tarde.', imageUrl: 'https://picsum.photos/seed/look1/400/600', score: 92, items: [MOCK_WARDROBE[0], MOCK_WARDROBE[1]] },
-    { id: 'l2', name: 'Poder Executivo', description: 'Combinação clássica para reuniões de negócios.', imageUrl: 'https://picsum.photos/seed/look2/400/600', score: 95, items: [MOCK_WARDROBE[3], MOCK_WARDROBE[1]] },
+    { id: 'l1', name: 'Casual Chic de Verão', description: 'Um look leve e elegante para um passeio à tarde.', imageUrl: 'https://picsum.photos/seed/look1/400/600', score: 9.2, items: [MOCK_WARDROBE[0], MOCK_WARDROBE[1]] },
+    { id: 'l2', name: 'Poder Executivo', description: 'Combinação clássica para reuniões de negócios.', imageUrl: 'https://picsum.photos/seed/look2/400/600', score: 9.5, items: [MOCK_WARDROBE[3], MOCK_WARDROBE[1]] },
 ];
 
 export const FILTER_OPTIONS = {

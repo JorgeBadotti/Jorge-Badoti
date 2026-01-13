@@ -109,7 +109,7 @@ export const classifyClothingItem = async (image: File): Promise<{ name: string,
     const prompt = `Analise a imagem da peça de roupa. Sua tarefa é classificá-la usando categorias de moda do Brasil. Forneça um nome descritivo para a peça (ex: 'Camisa de Botão Azul Claro', 'Calça Jeans Skinny Rasgada', 'Bolsa de Couro Caramelo') e escolha a categoria mais apropriada da seguinte lista: ${categories}. Certifique-se de que a categoria retornada seja EXATAMENTE uma das opções fornecidas. Retorne um JSON com as chaves "name" e "category".`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-3-flash-preview',
       contents: { parts: [imagePart, { text: prompt }] },
       config: {
         responseMimeType: "application/json",
@@ -138,9 +138,9 @@ export const classifyClothingItem = async (image: File): Promise<{ name: string,
   } catch(error) {
     console.error("Error in classifyClothingItem:", error);
     if (error instanceof Error && error.message.toLowerCase().includes('quota')) {
-        throw new Error("Cota da API excedida. Verifique o status da sua chave.");
+        throw new Error("Cota da API para classificação excedida.");
     }
-    throw new Error("Falha na classificação.");
+    throw new Error("Falha na classificação via IA.");
   }
 };
 
@@ -157,7 +157,8 @@ export const generateLookDescriptions = async (
     }
     const mockLooks: GeneratedLook[] = [
       { look_id: "mock1", name: "Look Urbano (Mock)", explanation: "Uma combinação perfeita para o dia a dia na cidade, unindo conforto e estilo.", body_affinity_index: 9.5, status: "DRAFT", items: [{id: items[0].id, name: items[0].name, source: 'closet'}, {id: items[1].id, name: items[1].name, source: 'closet'}] },
-      { look_id: "mock2", name: "Elegância Casual (Mock)", explanation: "Ideal para um encontro casual ou um happy hour, este look é sofisticado na medida certa.", body_affinity_index: 9.2, status: "DRAFT", items: items.length > 2 ? [{id: items[0].id, name: items[0].name, source: 'closet'}, {id: items[2].id, name: items[2].name, source: 'closet'}] : [{id: items[0].id, name: items[0].name, source: 'closet'}, {id: items[1].id, name: items[1].name, source: 'closet'}] }
+      { look_id: "mock2", name: "Elegância Casual (Mock)", explanation: "Ideal para um encontro casual ou um happy hour, este look é sofisticado na medida certa.", body_affinity_index: 9.2, status: "DRAFT", items: items.length > 2 ? [{id: items[0].id, name: items[0].name, source: 'closet'}, {id: items[2].id, name: items[2].name, source: 'closet'}] : [{id: items[0].id, name: items[0].name, source: 'closet'}, {id: items[1].id, name: items[1].name, source: 'closet'}] },
+      { look_id: "mock3", name: "Aventura de Fim de Semana (Mock)", explanation: "Confortável e pronto para qualquer atividade ao ar livre.", body_affinity_index: 8.8, status: "DRAFT", items: items.length > 3 ? [{id: items[1].id, name: items[1].name, source: 'closet'}, {id: items[3].id, name: items[3].name, source: 'closet'}] : [{id: items[0].id, name: items[0].name, source: 'closet'}, {id: items[1].id, name: items[1].name, source: 'closet'}] }
     ];
     return { looks: mockLooks };
   }
@@ -182,7 +183,7 @@ Diretrizes de Geração:
 2. Prioridade de Peças: O usuário está pedindo um look para a seguinte ocasião: "${userPrompt}". Se houver peças selecionadas (source: 'closet'), considere-as como peças-chave e construa o look ao redor delas. Complete o look preferencialmente com itens do user_closet.
 3. Upselling Técnico: Sugira uma peça da store_catalog (source: 'store') apenas se ela resolver um problema de proporção ou elevar o estilo básico.
 4. Tom de Voz: Profissional, direto e consultivo. Explique o "porquê" técnico de cada escolha.
-5. Gere até 2 looks.
+5. Gere exatamente 3 looks.
 
 Peças Disponíveis:
 ${JSON.stringify(itemsWithSource)}
